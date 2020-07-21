@@ -10,6 +10,7 @@
         android:id="@+id/chatMessageView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="end"
         app:cmv_arrowGravity="start"
         app:cmv_arrowMargin="3dp"
         app:cmv_arrowPosition="right"
@@ -20,13 +21,11 @@
         app:cmv_showArrow="true">
 
         <TextView
-            android:id="@+id/userText"
+            android:id="@+id/textView"
             style="@style/TextAppearance.AppCompat.Body1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Hello">
-
-        </TextView>
+            android:text="Hello" />
 
     </me.himanshusoni.chatmessageview.ChatMessageView>
 </LinearLayout>

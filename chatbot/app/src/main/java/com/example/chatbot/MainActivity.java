@@ -64,10 +64,10 @@ public class MainActivity extends AppCompatActivity {
 
                 if (TextUtils.isEmpty(message)) {
                     Toast.makeText(MainActivity.this, "Please enter a query!", Toast.LENGTH_SHORT).show();
+                } else {
+                    sendMessage(message);
+                    botReply(response);
                 }
-
-                sendMessage(message);
-                botReply(response);
 
                 //Clear Edit Text
                 editTextMessage.setText("");
@@ -78,11 +78,14 @@ public class MainActivity extends AppCompatActivity {
         boolean available = isSDCartAvailable();
 
         AssetManager assetManager = getResources().getAssets();
-        File fileName = new File(Environment.getExternalStorageState() + "/TBC/bots/TBC");
+        File fileName = new File(Environment.getExternalStorageState().toString() + "/TBC/bots/TBC");
 
         boolean makeFile = fileName.mkdirs();
 
         if (fileName.exists()) {
+
+            //Read the line
+            
             try {
                 for (String dir : Objects.requireNonNull(assetManager.list("TBC"))) {
 
@@ -118,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //Get the working directory
-        MagicStrings.root_path = Environment.getExternalStorageState() + "/TBC";
+        MagicStrings.root_path = Environment.getExternalStorageState().toString() + "/TBC";
         AIMLProcessor.extension = new PCAIMLProcessorExtension();
 
         bot = new Bot("TBC", MagicStrings.root_path, "chat");

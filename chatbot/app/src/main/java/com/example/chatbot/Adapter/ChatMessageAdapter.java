@@ -47,13 +47,13 @@ public class ChatMessageAdapter extends ArrayAdapter<ChatMessage> {
             convertView = LayoutInflater.from(getContext())
                     .inflate(R.layout.user_query_layout, parent, false);
 
-            TextView userText = convertView.findViewById(R.id.userText);
+            TextView userText = convertView.findViewById(R.id.textView);
             userText.setText(Objects.requireNonNull(getItem(position)).getContext());
         } else {
             convertView = LayoutInflater.from(getContext())
                     .inflate(R.layout.bot_reply_layout, parent, false);
 
-            TextView userText = convertView.findViewById(R.id.botText);
+            TextView userText = convertView.findViewById(R.id.textView);
             userText.setText(Objects.requireNonNull(getItem(position)).getContext());
         }
 
