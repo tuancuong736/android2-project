@@ -75,53 +75,59 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        boolean available = isSDCartAvailable();
+        boolean available = isSDCardAvailable();
 
-        AssetManager assetManager = getResources().getAssets();
-        File fileName = new File(Environment.getExternalStorageState().toString() + "/TBC/bots/TBC");
+        if (available) {
+            AssetManager assetManager = getResources().getAssets();
+            File fileName = new File(Environment.getExternalStorageState() + "/TBC/bots/TBC");
 
-        boolean makeFile = fileName.mkdirs();
+            boolean makeFile = fileName.mkdirs();
 
-        if (fileName.exists()) {
+            if (makeFile) {
+                if (fileName.exists()) {
 
-            //Read the line
-            
-            try {
-                for (String dir : Objects.requireNonNull(assetManager.list("TBC"))) {
+                    //Read the line
 
-                    File subDir = new File(fileName.getPath() + "/" + dir);
+                    try {
+                        for (String dir : Objects.requireNonNull(assetManager.list("TBC"))) {
 
-                    boolean surDirCheck = subDir.mkdirs();
+                            File subDir = new File(fileName.getPath() + "/" + dir);
 
-                    for (String file : Objects.requireNonNull(assetManager.list("TBC/" + dir))) {
+                            boolean surDirCheck = subDir.mkdirs();
 
-                        File newFile = new File(fileName.getPath() + "/" + dir + "/" + file);
+                            if (surDirCheck) {
+                                for (String file : Objects.requireNonNull(assetManager.list("TBC/" + dir))) {
 
-                        if (newFile.exists()) {
-                            continue;
+                                    File newFile = new File(fileName.getPath() + "/" + dir + "/" + file);
+
+                                    if (newFile.exists()) {
+                                        continue;
+                                    }
+
+                                    InputStream inputStream;
+                                    OutputStream outputStream;
+                                    String string;
+                                    inputStream = assetManager.open("TBC/" + dir + "/" + file);
+                                    outputStream = new FileOutputStream(fileName.getPath() + "/" + dir + "/" + file);
+
+                                    //Copy files from assets to the mobile's sd card or any secondary memory available
+
+                                    copyFile(inputStream, outputStream);
+                                    inputStream.close();
+                                    outputStream.flush();
+                                    outputStream.close();
+                                }
+                            }
                         }
-
-                        InputStream inputStream;
-                        OutputStream outputStream;
-                        String string;
-                        inputStream = assetManager.open("TBC/" + dir + "/" + file);
-                        outputStream = new FileOutputStream(fileName.getPath() + "/" + dir + "/" + file);
-
-                        //Copy files from assets to the mobile's sd card or any secondary memory available
-
-                        copyFile(inputStream, outputStream);
-                        inputStream.close();
-                        outputStream.flush();
-                        outputStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
             }
         }
 
         //Get the working directory
-        MagicStrings.root_path = Environment.getExternalStorageState().toString() + "/TBC";
+        MagicStrings.root_path = Environment.getExternalStorageState() + "/TBC";
         AIMLProcessor.extension = new PCAIMLProcessorExtension();
 
         bot = new Bot("TBC", MagicStrings.root_path, "chat");
@@ -137,8 +143,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private static boolean isSDCartAvailable() {
-        return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)? true : false;
+    public static boolean isSDCardAvailable() {
+        return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
     }
 
     private void botReply(String response) {
