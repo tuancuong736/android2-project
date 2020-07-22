@@ -21,9 +21,11 @@ public class ChatMessageAdapter extends ArrayAdapter<ChatMessage> {
 
     private static final int MY_MESSAGE = 0;
     private static final int BOT_MESSAGE = 1;
+    /*private static final int MY_IMAGE = 2;
+    private static final int BOT_IMAGE = 3;*/
 
     public ChatMessageAdapter(@NonNull Context context, List<ChatMessage> data) {
-        super(context, R.layout.user_query_layout ,data);
+        super(context, R.layout.user_query_layout, data);
     }
 
     @Override
@@ -31,10 +33,13 @@ public class ChatMessageAdapter extends ArrayAdapter<ChatMessage> {
 
         ChatMessage item = getItem(position);
 
-        assert item != null;
         if (item.isMine() && !item.isImage()) {
-            return  MY_MESSAGE;
-        } else return BOT_MESSAGE;
+            return MY_MESSAGE;
+        } else {
+            return BOT_MESSAGE;
+        } /*else if (item.isMine() && item.isImage()) {
+            return MY_IMAGE;
+        } else return BOT_IMAGE;*/
     }
 
     @NonNull
@@ -47,13 +52,13 @@ public class ChatMessageAdapter extends ArrayAdapter<ChatMessage> {
             convertView = LayoutInflater.from(getContext())
                     .inflate(R.layout.user_query_layout, parent, false);
 
-            TextView userText = convertView.findViewById(R.id.textView);
+            TextView userText = convertView.findViewById(R.id.userQuery);
             userText.setText(Objects.requireNonNull(getItem(position)).getContext());
-        } else {
+        } else if (viewType == BOT_MESSAGE) {
             convertView = LayoutInflater.from(getContext())
                     .inflate(R.layout.bot_reply_layout, parent, false);
 
-            TextView userText = convertView.findViewById(R.id.textView);
+            TextView userText = convertView.findViewById(R.id.botResponse);
             userText.setText(Objects.requireNonNull(getItem(position)).getContext());
         }
 

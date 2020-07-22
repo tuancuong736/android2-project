@@ -20,7 +20,7 @@
         app:cmv_showArrow="true">
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/botResponse"
             style="@style/TextAppearance.AppCompat.Body1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

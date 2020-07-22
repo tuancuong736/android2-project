@@ -2,6 +2,7 @@ package com.example.chatbot;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.Manifest;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.os.Environment;
@@ -15,6 +16,13 @@ import android.widget.Toast;
 import com.example.chatbot.Adapter.ChatMessageAdapter;
 import com.example.chatbot.Model.ChatMessage;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.DexterError;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.PermissionRequestErrorListener;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
 import org.alicebot.ab.AIMLProcessor;
 import org.alicebot.ab.Bot;
@@ -28,16 +36,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
     private ListView listView;
-    private ImageView imageView;
     private EditText editTextMessage;
-    private FloatingActionButton btnSend;
 
-    private Bot bot;
     public static Chat chat;
     private ChatMessageAdapter adapter;
 
@@ -47,9 +53,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         listView = findViewById(R.id.mainListView);
-        imageView = findViewById(R.id.mainImageView);
+        ImageView imageView = findViewById(R.id.mainImageView);
         editTextMessage = findViewById(R.id.mainEditTextMessage);
-        btnSend = findViewById(R.id.mainButtonSend);
+        FloatingActionButton btnSend = findViewById(R.id.mainButtonSend);
 
         adapter = new ChatMessageAdapter(this, new ArrayList<ChatMessage>());
         listView.setAdapter(adapter);
@@ -75,11 +81,45 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        checkMultiplePermission();
+    }
+
+    private void checkMultiplePermission() {
+        Dexter.withContext(this)
+                .withPermissions(
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ).withListener(new MultiplePermissionsListener() {
+
+            @Override
+            public void onPermissionsChecked(MultiplePermissionsReport multiplePermissionsReport) {
+                if (multiplePermissionsReport.areAllPermissionsGranted()) {
+                    proceed();
+                    Toast.makeText(MainActivity.this, "Permission granted!", Toast.LENGTH_SHORT).show();
+                }
+                if (multiplePermissionsReport.isAnyPermissionPermanentlyDenied()) {
+                    Toast.makeText(MainActivity.this, "Please grant all permissions!", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onPermissionRationaleShouldBeShown(List<PermissionRequest> list, PermissionToken permissionToken) {
+                permissionToken.continuePermissionRequest();
+            }
+        }).withErrorListener(new PermissionRequestErrorListener() {
+            @Override
+            public void onError(DexterError dexterError) {
+                Toast.makeText(MainActivity.this, "" + dexterError, Toast.LENGTH_SHORT).show();
+            }
+        }).onSameThread().check();
+    }
+
+    private void proceed() {
         boolean available = isSDCardAvailable();
 
         if (available) {
             AssetManager assetManager = getResources().getAssets();
-            File fileName = new File(Environment.getExternalStorageState() + "/TBC/bots/TBC");
+            File fileName = new File(Environment.getExternalStorageState() + "/TBC/bots/SampleBot");
 
             boolean makeFile = fileName.mkdirs();
 
@@ -89,14 +129,14 @@ public class MainActivity extends AppCompatActivity {
                     //Read the line
 
                     try {
-                        for (String dir : Objects.requireNonNull(assetManager.list("TBC"))) {
+                        for (String dir : Objects.requireNonNull(assetManager.list("SampleBot"))) {
 
                             File subDir = new File(fileName.getPath() + "/" + dir);
 
                             boolean surDirCheck = subDir.mkdirs();
 
                             if (surDirCheck) {
-                                for (String file : Objects.requireNonNull(assetManager.list("TBC/" + dir))) {
+                                for (String file : Objects.requireNonNull(assetManager.list("SampleBot/" + dir))) {
 
                                     File newFile = new File(fileName.getPath() + "/" + dir + "/" + file);
 
@@ -107,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
                                     InputStream inputStream;
                                     OutputStream outputStream;
                                     String string;
-                                    inputStream = assetManager.open("TBC/" + dir + "/" + file);
+                                    inputStream = assetManager.open("SampleBot/" + dir + "/" + file);
                                     outputStream = new FileOutputStream(fileName.getPath() + "/" + dir + "/" + file);
 
                                     //Copy files from assets to the mobile's sd card or any secondary memory available
@@ -117,20 +157,20 @@ public class MainActivity extends AppCompatActivity {
                                     outputStream.flush();
                                     outputStream.close();
                                 }
-                            }
+                            } else Toast.makeText(MainActivity.this, "Sub Directory failed check!", Toast.LENGTH_SHORT).show();
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                }
-            }
-        }
+                } else Toast.makeText(MainActivity.this, "File doesn't exists!", Toast.LENGTH_SHORT).show();
+            } else Toast.makeText(MainActivity.this, "Can't make file!", Toast.LENGTH_SHORT).show();
+        } else Toast.makeText(MainActivity.this, "SD Card isn't available!", Toast.LENGTH_SHORT).show();
 
         //Get the working directory
         MagicStrings.root_path = Environment.getExternalStorageState() + "/TBC";
         AIMLProcessor.extension = new PCAIMLProcessorExtension();
 
-        bot = new Bot("TBC", MagicStrings.root_path, "chat");
+        Bot bot = new Bot("SampleBot", MagicStrings.root_path, "chat");
         chat = new Chat(bot);
     }
 
