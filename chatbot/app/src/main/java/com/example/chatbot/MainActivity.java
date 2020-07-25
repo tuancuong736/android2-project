@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
             AssetManager assetManager = getResources().getAssets();
             File fileName = new File(Environment.getExternalStorageState() + "/TBC/bots/SampleBot");
 
-            boolean makeFile = fileName.mkdirs();
+            boolean makeFile = fileName.mkdir();
 
             if (makeFile) {
                 if (fileName.exists()) {
@@ -133,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
 
                             File subDir = new File(fileName.getPath() + "/" + dir);
 
-                            boolean surDirCheck = subDir.mkdirs();
+                            boolean surDirCheck = subDir.mkdir();
 
                             if (surDirCheck) {
                                 for (String file : Objects.requireNonNull(assetManager.list("SampleBot/" + dir))) {
