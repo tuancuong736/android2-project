@@ -45,6 +45,7 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
 
     //WATSON IBM CLOUD
+    implementation 'com.ibm.watson:ibm-watson:8.5.0' //include ibm watson cloud
     implementation 'com.ibm.watson:assistant:8.5.0' //ibm cloud watson assistant
     implementation 'com.ibm.watson:text-to-speech:8.5.0' //ibm cloud text to speech service
     implementation 'com.ibm.watson:speech-to-text:8.5.0' //ibm cloud speed to text service
