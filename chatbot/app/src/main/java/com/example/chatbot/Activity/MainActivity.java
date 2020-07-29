@@ -13,7 +13,9 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -106,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (permission != PackageManager.PERMISSION_GRANTED) {
             Log.i(TAG, "Permission to record denied!");
+            makeRequest();
         } else Log.i(TAG, "Permission to record was already granted!");
 
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(mContext, recyclerView, new ClickListener() {
@@ -131,6 +134,16 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        btnRecord.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                recordMessage();
+            }
+        });
+
+        createServices();
+        sendMessage();
     }
 
     //Check Internet Connection
@@ -147,6 +160,34 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "No Internet Connection available!", Toast.LENGTH_SHORT).show();
             return false;
+        }
+    }
+
+    //Create a request to user
+    protected void makeRequest() {
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.RECORD_AUDIO},
+                MicrophoneHelper.REQUEST_PERMISSION);
+    }
+
+    //Speech to Text Record Audio permission
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case REQUEST_RECORD_AUDIO_PERMISSION:
+                permissionToRecordAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                break;
+            case RECORD_REQUEST_CODE:
+                if (grantResults.length == 0 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                    Log.i(TAG, "Permission has been denied by user!");
+                } else Log.i(TAG, "Permission has been granted by user!");
+                return;
+            case MicrophoneHelper.REQUEST_PERMISSION: {
+                if (grantResults.length > 0 && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, "Permission to record audio denied!", Toast.LENGTH_SHORT).show();
+                }
+            }
         }
     }
 
@@ -226,7 +267,7 @@ public class MainActivity extends AppCompatActivity {
 
     //Send a message to Watson Assistant Service
     private void sendMessage() {
-        
+
     }
 
     private void showMicCheck(final String text) {
