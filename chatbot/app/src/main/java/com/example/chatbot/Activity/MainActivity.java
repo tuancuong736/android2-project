@@ -28,8 +28,15 @@ import com.example.chatbot.Model.Message;
 import com.example.chatbot.R;
 import com.ibm.cloud.sdk.core.http.HttpMediaType;
 import com.ibm.cloud.sdk.core.http.Response;
+import com.ibm.cloud.sdk.core.http.ServiceCall;
 import com.ibm.cloud.sdk.core.security.IamAuthenticator;
 import com.ibm.watson.assistant.v2.Assistant;
+import com.ibm.watson.assistant.v2.model.CreateSessionOptions;
+import com.ibm.watson.assistant.v2.model.DialogNodeOutputOptionsElement;
+import com.ibm.watson.assistant.v2.model.MessageInput;
+import com.ibm.watson.assistant.v2.model.MessageOptions;
+import com.ibm.watson.assistant.v2.model.MessageResponse;
+import com.ibm.watson.assistant.v2.model.RuntimeResponseGeneric;
 import com.ibm.watson.assistant.v2.model.SessionResponse;
 import com.ibm.watson.developer_cloud.android.library.audio.MicrophoneHelper;
 import com.ibm.watson.developer_cloud.android.library.audio.MicrophoneInputStream;
@@ -44,6 +51,7 @@ import com.ibm.watson.text_to_speech.v1.model.SynthesizeOptions;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
@@ -189,6 +197,9 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+        /*if (!permissionToRecordAccepted) {
+            finish();
+        }*/
     }
 
     //Handling voice of Bot
@@ -267,7 +278,117 @@ public class MainActivity extends AppCompatActivity {
 
     //Send a message to Watson Assistant Service
     private void sendMessage() {
+        final String inputMessage = this.inputMessage.getText().toString().trim();
 
+        if (!this.initialRequest) {
+            //User's messages
+            Message messages = new Message();
+            messages.setMessage(inputMessage);
+            messages.setId("1"); //UserId's messages
+            messageArrayList.add(messages);
+        } else {
+            //Bot's messages
+            Message messages = new Message();
+            messages.setMessage(inputMessage);
+            messages.setId("100"); //BotId's messages
+            this.initialRequest = false;
+            Toast.makeText(getApplicationContext(), "Tap on the message for voice!", Toast.LENGTH_SHORT).show();
+        }
+
+        this.inputMessage.setText("");
+        mAdapter.notifyDataSetChanged();
+
+        //Handle thread
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (watsonAssistantSession == null) {
+                        //Call watson assistant
+                        ServiceCall<SessionResponse> call = watsonAssistant.createSession(
+                                new CreateSessionOptions.Builder()
+                                        .assistantId(mContext.getString(R.string.assistant_id))
+                                        .build());
+                        watsonAssistantSession = call.execute();
+                    }
+
+                    MessageInput input = new MessageInput.Builder()
+                            .text(inputMessage)
+                            .build();
+                    MessageOptions options = new MessageOptions.Builder()
+                            .assistantId(mContext.getString(R.string.assistant_id))
+                            .input(input)
+                            .sessionId(watsonAssistantSession.getResult().getSessionId())
+                            .build();
+
+                    Response<MessageResponse> response = watsonAssistant.message(options).execute();
+                    Log.i(TAG, "run: " + response.getResult());
+
+                    if (response.getResult().getOutput() != null && !response.getResult().getOutput().getGeneric().isEmpty()) {
+
+                        List<RuntimeResponseGeneric> responses = response.getResult().getOutput().getGeneric();
+
+                        for (RuntimeResponseGeneric r : responses) {
+                            Message outMessage;
+                            switch (r.responseType()) {
+                                case "text":
+                                    outMessage = new Message();
+                                    outMessage.setMessage(r.text());
+                                    outMessage.setId("2");
+
+                                    messageArrayList.add(outMessage);
+
+                                    //speak the message
+                                    new SayTask().execute(outMessage.getMessage());
+                                    break;
+                                case "option":
+                                    outMessage = new Message();
+                                    String title = r.title();
+                                    String optionsOutput = "";
+
+                                    for (int i = 0; i < r.options().size(); i++) {
+                                        DialogNodeOutputOptionsElement option = r.options().get(i);
+                                        optionsOutput = optionsOutput + option.getLabel() + "\n";
+                                    }
+
+                                    outMessage.setMessage(title + "\n" + optionsOutput);
+                                    outMessage.setId("2");
+
+                                    messageArrayList.add(outMessage);
+
+                                    //speak the message
+                                    new SayTask().execute(outMessage.getMessage());
+                                    break;
+                                case "image":
+                                    outMessage = new Message();
+
+                                    messageArrayList.add(outMessage);
+
+                                    //speak the message
+                                    new SayTask().execute("You received an image: " + outMessage.getTitle() + outMessage.getDescription());
+                                    break;
+                                default:
+                                    Log.e("Error", "Unhandled message type!");
+                            }
+                        }
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mAdapter.notifyDataSetChanged();
+                                if (mAdapter.getItemCount() > 1) {
+                                    recyclerView.getLayoutManager().smoothScrollToPosition(recyclerView, null, mAdapter.getItemCount() - 1);
+                                }
+                            }
+                        });
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        thread.start();
     }
 
     private void showMicCheck(final String text) {
