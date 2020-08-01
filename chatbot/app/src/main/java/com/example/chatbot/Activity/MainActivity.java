@@ -29,10 +29,10 @@ import com.example.chatbot.Listener.ClickListener;
 import com.example.chatbot.Listener.RecyclerTouchListener;
 import com.example.chatbot.Model.Message;
 import com.example.chatbot.R;
+import com.ibm.cloud.sdk.core.http.HttpConfigOptions;
 import com.ibm.cloud.sdk.core.http.HttpMediaType;
 import com.ibm.cloud.sdk.core.http.Response;
 import com.ibm.cloud.sdk.core.http.ServiceCall;
-import com.ibm.cloud.sdk.core.security.Authenticator;
 import com.ibm.cloud.sdk.core.security.BasicAuthenticator;
 import com.ibm.cloud.sdk.core.security.IamAuthenticator;
 import com.ibm.watson.assistant.v2.Assistant;
@@ -47,7 +47,6 @@ import com.ibm.watson.developer_cloud.android.library.audio.MicrophoneHelper;
 import com.ibm.watson.developer_cloud.android.library.audio.MicrophoneInputStream;
 import com.ibm.watson.developer_cloud.android.library.audio.StreamPlayer;
 import com.ibm.watson.developer_cloud.android.library.audio.utils.ContentType;
-import com.ibm.watson.discovery.v2.Discovery;
 import com.ibm.watson.speech_to_text.v1.SpeechToText;
 import com.ibm.watson.speech_to_text.v1.model.RecognizeOptions;
 import com.ibm.watson.speech_to_text.v1.model.SpeechRecognitionResults;
@@ -66,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText inputMessage;
     private ImageButton btnSend;
     private ImageButton btnRecord;
-    StreamPlayer streamPlayer = new StreamPlayer();
+    private StreamPlayer streamPlayer = new StreamPlayer();
     private boolean initialRequest;
     private boolean permissionToRecordAccepted = false;
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
@@ -83,24 +82,16 @@ public class MainActivity extends AppCompatActivity {
     private SpeechToText speechToText;
     private TextToSpeech textToSpeech;
 
-    //Call Watson Assistant, Session Response, Speech to Text + Text To Speech Services
-    private void createServices() {
-        watsonAssistant = new Assistant("2019-02-28", new IamAuthenticator(mContext.getString(R.string.assistant_apikey)));
-        watsonAssistant.setServiceUrl(mContext.getString(R.string.assistant_url));
-
-        textToSpeech = new TextToSpeech(new IamAuthenticator((mContext.getString(R.string.TTS_apikey))));
-        textToSpeech.setServiceUrl(mContext.getString(R.string.TTS_url));
-
-        speechToText = new SpeechToText(new IamAuthenticator(mContext.getString(R.string.STT_apikey)));
-        speechToText.setServiceUrl(mContext.getString(R.string.STT_url));
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         mContext = getApplicationContext();
+
+        watsonAssistant = initWatsonAssistant();
+        textToSpeech = initTextToSpeech();
+        speechToText = initSpeechToText();
 
         inputMessage = findViewById(R.id.message);
         btnSend = findViewById(R.id.btn_send);
@@ -160,8 +151,29 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        createServices();
         sendMessage();
+    }
+
+    private Assistant initWatsonAssistant() {
+        Assistant service = new Assistant("2020-04-01", new IamAuthenticator(mContext.getString(R.string.assistant_apikey)));
+        //watsonAssistant = new Assistant("2020-04-01", new BasicAuthenticator(mContext.getString(R.string.ibm_username), mContext.getString(R.string.ibm_password)));
+        service.setServiceUrl(mContext.getString(R.string.assistant_url));
+        //watsonAssistant.setServiceUrl(mContext.getString(R.string.forbidden_solved));
+        return service;
+    }
+
+    private TextToSpeech initTextToSpeech() {
+        TextToSpeech service = new TextToSpeech(new IamAuthenticator((mContext.getString(R.string.TTS_apikey))));
+        service.setServiceUrl(mContext.getString(R.string.TTS_url));
+        //textToSpeech.setServiceUrl(mContext.getString(R.string.forbidden_solved));
+        return service;
+    }
+
+    private SpeechToText initSpeechToText() {
+        SpeechToText service = new SpeechToText(new IamAuthenticator(mContext.getString(R.string.STT_apikey)));
+        service.setServiceUrl(mContext.getString(R.string.STT_url));
+        //speechToText.setServiceUrl(mContext.getString(R.string.forbidden_solved));
+        return service;
     }
 
     @Override
@@ -199,9 +211,9 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
-        /*if (!permissionToRecordAccepted) {
+        if (!permissionToRecordAccepted) {
             finish();
-        }*/
+        }
     }
 
     //Create a request to user
