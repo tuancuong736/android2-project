@@ -29,7 +29,6 @@ import com.example.chatbot.Listener.ClickListener;
 import com.example.chatbot.Listener.RecyclerTouchListener;
 import com.example.chatbot.Model.Message;
 import com.example.chatbot.R;
-import com.ibm.cloud.sdk.core.http.HttpConfigOptions;
 import com.ibm.cloud.sdk.core.http.HttpMediaType;
 import com.ibm.cloud.sdk.core.http.Response;
 import com.ibm.cloud.sdk.core.http.ServiceCall;
@@ -65,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText inputMessage;
     private ImageButton btnSend;
     private ImageButton btnRecord;
+    private ImageButton btnTransfer;
     private StreamPlayer streamPlayer = new StreamPlayer();
     private boolean initialRequest;
     private boolean permissionToRecordAccepted = false;
@@ -96,9 +96,12 @@ public class MainActivity extends AppCompatActivity {
         inputMessage = findViewById(R.id.message);
         btnSend = findViewById(R.id.btn_send);
         btnRecord = findViewById(R.id.btn_record);
+        btnTransfer = findViewById(R.id.btn_transfer);
+
         String customFont = "Montserrat-Regular.ttf";
         Typeface typeface = Typeface.createFromAsset(getAssets(), customFont);
         inputMessage.setTypeface(typeface);
+
         recyclerView = findViewById(R.id.recycler_view);
 
         messageArrayList = new ArrayList<>();
@@ -230,7 +233,7 @@ public class MainActivity extends AppCompatActivity {
         if (inputMessage.equalsIgnoreCase("")) {
             Toast.makeText(getApplicationContext(), "Please input your query!", Toast.LENGTH_SHORT).show();
         } else {
-            if (!this.initialRequest) {
+            if (this.initialRequest) {
                 //User's messages
                 Message messages = new Message();
                 messages.setMessage(inputMessage);
@@ -311,6 +314,8 @@ public class MainActivity extends AppCompatActivity {
                                         break;
                                     case "image":
                                         outMessage = new Message();
+                                        outMessage.setMessage(r.source());
+                                        outMessage.setId("2");
 
                                         messageArrayList.add(outMessage);
 
