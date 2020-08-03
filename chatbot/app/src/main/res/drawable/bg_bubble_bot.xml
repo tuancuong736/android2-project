@@ -5,7 +5,7 @@
 
     <!-- view background color -->
     <solid
-        android:color="@color/bg_bubble_watbot" >
+        android:color="@color/endMainColor" >
     </solid>
 
 
@@ -15,12 +15,12 @@
         android:left="10dp"
         android:top="4dp"
         android:right="10dp"
-        android:bottom="4dp"    >
+        android:bottom="4dp">
     </padding>
 
     <!-- Here is the corner radius -->
     <corners
-        android:radius="5dp"   >
+        android:radius="5dp">
     </corners>
 
 </shape>

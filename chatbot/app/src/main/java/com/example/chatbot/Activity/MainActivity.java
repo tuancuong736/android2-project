@@ -3,20 +3,32 @@ package com.example.chatbot.Activity;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
+import androidx.appcompat.widget.Toolbar;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -24,11 +36,15 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.chatbot.Adapter.ChatAdapter;
 import com.example.chatbot.Listener.ClickListener;
 import com.example.chatbot.Listener.RecyclerTouchListener;
 import com.example.chatbot.Model.Message;
 import com.example.chatbot.R;
+import com.google.android.gms.vision.Frame;
+import com.google.android.gms.vision.face.Face;
+import com.google.android.gms.vision.face.FaceDetector;
 import com.ibm.cloud.sdk.core.http.HttpMediaType;
 import com.ibm.cloud.sdk.core.http.Response;
 import com.ibm.cloud.sdk.core.http.ServiceCall;
@@ -62,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
     private ChatAdapter mAdapter;
     private ArrayList messageArrayList;
     private EditText inputMessage;
+    private ImageView inputImage;
     private ImageButton btnSend;
     private ImageButton btnRecord;
     private ImageButton btnTransfer;
@@ -93,7 +110,11 @@ public class MainActivity extends AppCompatActivity {
         textToSpeech = initTextToSpeech();
         speechToText = initSpeechToText();
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.my_main_toolbar);
+        setSupportActionBar(toolbar);
+
         inputMessage = findViewById(R.id.message);
+        inputImage = findViewById(R.id.image);
         btnSend = findViewById(R.id.btn_send);
         btnRecord = findViewById(R.id.btn_record);
         btnTransfer = findViewById(R.id.btn_transfer);
@@ -151,6 +172,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 recordMessage();
+            }
+        });
+
+        btnTransfer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
             }
         });
 
