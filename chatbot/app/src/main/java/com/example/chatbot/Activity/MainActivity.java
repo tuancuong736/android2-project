@@ -63,7 +63,6 @@ public class MainActivity extends AppCompatActivity {
     private ChatAdapter mAdapter;
     private ArrayList messageArrayList;
     private EditText inputMessage;
-    private ImageView inputImage;
     private ImageButton btnSend;
     private ImageButton btnRecord;
     private ImageButton btnCamera;
@@ -99,7 +98,6 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         inputMessage = findViewById(R.id.message);
-        inputImage = findViewById(R.id.image);
         btnSend = findViewById(R.id.btn_send);
         btnRecord = findViewById(R.id.btn_record);
         btnCamera = findViewById(R.id.btn_camera);
@@ -323,13 +321,11 @@ public class MainActivity extends AppCompatActivity {
                                         break;
                                     case "image":
                                         outMessage = new Message();
-                                        outMessage.setMessage(r.source());
+                                        outMessage.setType(Message.Type.IMAGE);
+                                        outMessage.setUrl(r.source());
                                         outMessage.setId("2");
 
                                         messageArrayList.add(outMessage);
-
-                                        //speak the message
-                                        new SayTask().execute("You received an image: " + outMessage.getTitle() + outMessage.getDescription());
                                         break;
                                     default:
                                         Log.e("Error", "Unhandled message type!");
