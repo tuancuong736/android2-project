@@ -3,21 +3,12 @@ package com.example.chatbot.Activity;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.RectF;
 import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,7 +19,6 @@ import android.widget.Toast;
 import androidx.appcompat.widget.Toolbar;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -36,19 +26,14 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.example.chatbot.Adapter.ChatAdapter;
 import com.example.chatbot.Listener.ClickListener;
 import com.example.chatbot.Listener.RecyclerTouchListener;
 import com.example.chatbot.Model.Message;
 import com.example.chatbot.R;
-import com.google.android.gms.vision.Frame;
-import com.google.android.gms.vision.face.Face;
-import com.google.android.gms.vision.face.FaceDetector;
 import com.ibm.cloud.sdk.core.http.HttpMediaType;
 import com.ibm.cloud.sdk.core.http.Response;
 import com.ibm.cloud.sdk.core.http.ServiceCall;
-import com.ibm.cloud.sdk.core.security.BasicAuthenticator;
 import com.ibm.cloud.sdk.core.security.IamAuthenticator;
 import com.ibm.watson.assistant.v2.Assistant;
 import com.ibm.watson.assistant.v2.model.CreateSessionOptions;
@@ -81,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView inputImage;
     private ImageButton btnSend;
     private ImageButton btnRecord;
-    private ImageButton btnTransfer;
+    private ImageButton btnCamera;
     private StreamPlayer streamPlayer = new StreamPlayer();
     private boolean initialRequest;
     private boolean permissionToRecordAccepted = false;
@@ -110,14 +95,14 @@ public class MainActivity extends AppCompatActivity {
         textToSpeech = initTextToSpeech();
         speechToText = initSpeechToText();
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.my_main_toolbar);
+        Toolbar toolbar = findViewById(R.id.my_main_toolbar);
         setSupportActionBar(toolbar);
 
         inputMessage = findViewById(R.id.message);
         inputImage = findViewById(R.id.image);
         btnSend = findViewById(R.id.btn_send);
         btnRecord = findViewById(R.id.btn_record);
-        btnTransfer = findViewById(R.id.btn_transfer);
+        btnCamera = findViewById(R.id.btn_camera);
 
         String customFont = "Montserrat-Regular.ttf";
         Typeface typeface = Typeface.createFromAsset(getAssets(), customFont);
@@ -175,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        btnTransfer.setOnClickListener(new View.OnClickListener() {
+        btnCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -187,23 +172,19 @@ public class MainActivity extends AppCompatActivity {
 
     private Assistant initWatsonAssistant() {
         Assistant service = new Assistant("2020-04-01", new IamAuthenticator(mContext.getString(R.string.assistant_apikey)));
-        //watsonAssistant = new Assistant("2020-04-01", new BasicAuthenticator(mContext.getString(R.string.ibm_username), mContext.getString(R.string.ibm_password)));
         service.setServiceUrl(mContext.getString(R.string.assistant_url));
-        //watsonAssistant.setServiceUrl(mContext.getString(R.string.forbidden_solved));
         return service;
     }
 
     private TextToSpeech initTextToSpeech() {
         TextToSpeech service = new TextToSpeech(new IamAuthenticator((mContext.getString(R.string.TTS_apikey))));
         service.setServiceUrl(mContext.getString(R.string.TTS_url));
-        //textToSpeech.setServiceUrl(mContext.getString(R.string.forbidden_solved));
         return service;
     }
 
     private SpeechToText initSpeechToText() {
         SpeechToText service = new SpeechToText(new IamAuthenticator(mContext.getString(R.string.STT_apikey)));
         service.setServiceUrl(mContext.getString(R.string.STT_url));
-        //speechToText.setServiceUrl(mContext.getString(R.string.forbidden_solved));
         return service;
     }
 

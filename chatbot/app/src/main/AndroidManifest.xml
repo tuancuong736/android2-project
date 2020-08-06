@@ -22,18 +22,20 @@
             android:name=".Activity.SplashActivity"
             android:screenOrientation="portrait"
             android:theme="@style/SplashTheme">
-
-        </activity>
-        <activity
-            android:name=".Activity.MainActivity"
-            android:screenOrientation="portrait" />
-        <activity android:name=".Activity.CameraDetectionActivity"
-            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".Activity.MainActivity"
+            android:screenOrientation="portrait" >
+
+        </activity>
+        <activity android:name=".Activity.CameraDetectionActivity"
+            android:screenOrientation="portrait">
+
         </activity>
 <!--        <meta-data-->
 <!--            android:name="com.google.android.gms.vision.DEPENDENCIES"-->
