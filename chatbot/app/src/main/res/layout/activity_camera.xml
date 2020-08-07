@@ -12,6 +12,12 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/btn_capture" />
 
+    <com.example.chatbot.Helper.GraphicOverlay
+        android:id="@+id/graphic_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/btn_capture" />
+
     <Button
         android:id="@+id/btn_capture"
         android:layout_width="match_parent"
