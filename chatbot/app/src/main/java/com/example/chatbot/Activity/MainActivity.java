@@ -9,12 +9,14 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
+
 import androidx.appcompat.widget.Toolbar;
 
 import androidx.annotation.NonNull;
@@ -220,9 +222,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
-        if (!permissionToRecordAccepted) {
-            finish();
-        }
     }
 
     //Create a request to user
@@ -302,7 +301,7 @@ public class MainActivity extends AppCompatActivity {
                                         break;
                                     case "option":
                                         outMessage = new Message();
-                                        String title = r.title();
+                                        String optionTitle = r.title();
                                         String optionsOutput = "";
 
                                         for (int i = 0; i < r.options().size(); i++) {
@@ -310,7 +309,7 @@ public class MainActivity extends AppCompatActivity {
                                             optionsOutput = optionsOutput + option.getLabel() + "\n";
                                         }
 
-                                        outMessage.setMessage(title + "\n" + optionsOutput);
+                                        outMessage.setMessage(optionTitle + "\n" + optionsOutput);
                                         outMessage.setId("2");
 
                                         messageArrayList.add(outMessage);
@@ -320,11 +319,19 @@ public class MainActivity extends AppCompatActivity {
                                         break;
                                     case "image":
                                         outMessage = new Message();
+
+                                        String imageTitle = r.title();
+                                        String imageDesc = r.description();
+                                        outMessage.setMessage(imageTitle + imageDesc);
+
                                         outMessage.setType(Message.Type.IMAGE);
                                         outMessage.setUrl(r.source());
                                         outMessage.setId("2");
 
                                         messageArrayList.add(outMessage);
+
+                                        //speak the message
+                                        new SayTask().execute(outMessage.getMessage());
                                         break;
                                     default:
                                         Log.e("Error", "Unhandled message type!");
@@ -468,5 +475,10 @@ public class MainActivity extends AppCompatActivity {
         public void onDisconnected() {
             enableMicButton();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        finishAffinity();
     }
 }

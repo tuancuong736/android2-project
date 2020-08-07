@@ -2,5 +2,5 @@
     <string name="app_name">Watson Chat Bot</string>
     <string name="what_s_on_your_mind">Enter your query</string>
     <string name="menu_refresh">Refresh</string>
-    <string name="detect_button">Detect</string>
+    <string name="camera_capture">Capture</string>
 </resources>

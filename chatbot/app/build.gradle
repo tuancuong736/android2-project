@@ -59,9 +59,6 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
 
-    //set up camera kit
-    implementation 'com.wonderkiln:camerakit:0.13.1' //old version
-
     //WATSON IBM CLOUD
     implementation 'com.ibm.watson:ibm-watson:8.5.0' //include ibm watson cloud
     implementation 'com.ibm.watson:assistant:8.5.0' //ibm cloud watson assistant
